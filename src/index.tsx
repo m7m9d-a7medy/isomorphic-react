@@ -2,12 +2,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import getStore from './getStore'
-import { Provider } from 'react-redux'
+import { Provider, ConnectedComponent } from 'react-redux'
 
 const store = getStore()
 
+const fetchDataForLocation = () => {
+    store.dispatch({
+        type: `REQUEST_FETCH_QUESTIONS`,
+        questions: []
+    })
+}
 
-const render = (_App: () => JSX.Element) => {
+const render = (_App: any) => {
     ReactDOM.render(
         <Provider store={store}>
             <_App />
@@ -17,3 +23,4 @@ const render = (_App: () => JSX.Element) => {
 }
 
 render(App)
+fetchDataForLocation()
