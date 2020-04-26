@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import QuestionList from './components/QuestionList'
 
 interface BaseProps {}
 
@@ -16,7 +17,8 @@ type Props = BaseProps & PropsFromRedux
 const App = (props: Props) => {
     return (
         <div>
-            <h1>Hello from App {props.test}</h1>
+            <h1>Isomorphic react</h1>
+            <QuestionList />
         </div>
     )
 }
