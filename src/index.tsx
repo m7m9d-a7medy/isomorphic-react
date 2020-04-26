@@ -2,9 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import getStore from './getStore'
-import { Provider, ConnectedComponent } from 'react-redux'
+import { Provider } from 'react-redux'
+import { ConnectedRouter } from 'connected-react-router'
+import { createBrowserHistory } from 'history'
 
-const store = getStore()
+const history = createBrowserHistory()
+
+const store = getStore(history)
 
 const fetchDataForLocation = () => {
     store.dispatch({
@@ -16,13 +20,15 @@ const fetchDataForLocation = () => {
 const render = (_App: any) => {
     ReactDOM.render(
         <Provider store={store}>
-            <_App />
+            <ConnectedRouter history={history}>
+                <_App />
+            </ConnectedRouter>
         </Provider>,
         document.getElementById('AppContainer')
     )
 }
 
-if(module.hot) {
+if (module.hot) {
     module.hot.accept('./App', () => {
         const nextApp = require('./App').default
         render(nextApp)
@@ -31,7 +37,7 @@ if(module.hot) {
 
 store.subscribe(() => {
     const state = store.getState()
-    if(state.questions.length > 0) {
+    if (state.questions.length > 0) {
         console.info('Mounting App')
         render(App)
     } else {

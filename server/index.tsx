@@ -1,8 +1,10 @@
 import React from 'react'
 import { renderToString } from 'react-dom/server'
-import {Provider} from 'react-redux'
+import { Provider } from 'react-redux'
 import App from '../src/App'
 import getStore from '../src/getStore'
+import { createMemoryHistory } from 'history'
+import {ConnectedRouter} from 'connected-react-router'
 
 import { StackoverflowResponse } from './../data/types';
 import express from 'express'
@@ -64,7 +66,6 @@ app.get('/api/questions', async (req, res) => {
 })
 
 app.get('/api/questions/:id', async (req, res) => {
-    console.log(req.params)
     const data = await getQuestion(req.params.id as any as number)
     await delay(1000)
     res.json(data)
@@ -83,7 +84,7 @@ if (process.env.NODE_ENV === 'development') {
     app.use(webpackHotMiddleware(compiler))
 }
 
-app.get(['/'], async (req, res) => {
+app.get(['/', '/questions/:id'], async (req, res) => {
     let index = await fs.readFile('./public/index.html', 'utf-8')
     const initialState: { questions: Array<Question> } = {
         questions: []
@@ -91,12 +92,18 @@ app.get(['/'], async (req, res) => {
 
     const questions = await getQuestions()
     initialState.questions = questions.items
-    const store = getStore(initialState)
+    const history = createMemoryHistory({
+        initialEntries: [req.path]
+    })
+    
+    const store = getStore(history, initialState)
 
     if (useServerRender) {
         const renderedApp = renderToString((
             <Provider store={store}>
-                <App />
+                <ConnectedRouter history={history}>
+                    <App />
+                </ConnectedRouter>
             </Provider>
         ))
         index = index.replace(`<%= preloadedApplication %>`, renderedApp)

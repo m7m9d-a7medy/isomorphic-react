@@ -1,13 +1,17 @@
 import { createStore, combineReducers, applyMiddleware, StoreEnhancer } from 'redux'
-import { identity } from 'lodash'
 import createSagaMiddleware from 'redux-saga'
 import { createLogger } from 'redux-logger'
 import fetchQuesionsSaga from './sagas/fetch-questions.saga'
 import * as reducers from './reducers'
+import { routerMiddleware, connectRouter } from 'connected-react-router'
+import { History } from 'history'
 
-export default (defaultState: any = {}) => {
+export default (history: History, defaultState: any = {}) => {
     const sagaMiddleware = createSagaMiddleware()
+    const routerMiddleWareObj = routerMiddleware(history)
+
     const middlewareChain: any[] = [
+        routerMiddleWareObj,
         sagaMiddleware,
     ]
 
@@ -18,7 +22,8 @@ export default (defaultState: any = {}) => {
 
     const store = createStore(
         combineReducers({
-            ...reducers
+            ...reducers,
+            router: connectRouter(history),
         }),
         defaultState,
         applyMiddleware(...middlewareChain)
