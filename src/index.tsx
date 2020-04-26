@@ -22,5 +22,12 @@ const render = (_App: any) => {
     )
 }
 
+if(module.hot) {
+    module.hot.accept('./App', () => {
+        const nextApp = require('./App').default
+        render(nextApp)
+    })
+}
+
 render(App)
 fetchDataForLocation()
