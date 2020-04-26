@@ -1,3 +1,9 @@
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import {Provider} from 'react-redux'
+import App from '../src/App'
+import getStore from '../src/getStore'
+
 import { StackoverflowResponse } from './../data/types';
 import express from 'express'
 import fs from 'fs-extra'
@@ -15,6 +21,7 @@ const port = process.env.PORT || 3000
 const app = express()
 
 const useLiveData = argv.useLiveData === true
+const useServerRender = argv.useServerRender === true
 
 const getQuestions = async (): Promise<StackoverflowResponse> => {
     let data
@@ -78,6 +85,24 @@ if (process.env.NODE_ENV === 'development') {
 
 app.get(['/'], async (req, res) => {
     let index = await fs.readFile('./public/index.html', 'utf-8')
+    const initialState: { questions: Array<Question> } = {
+        questions: []
+    }
+
+    const questions = await getQuestions()
+    initialState.questions = questions.items
+    const store = getStore(initialState)
+
+    if (useServerRender) {
+        const renderedApp = renderToString((
+            <Provider store={store}>
+                <App />
+            </Provider>
+        ))
+        index = index.replace(`<%= preloadedApplication %>`, renderedApp)
+    } else {
+        index = index.replace(`<%= preloadedApplication %>`, `Please wait till we load the application`)
+    }
     res.send(index)
 })
 

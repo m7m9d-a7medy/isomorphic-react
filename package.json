@@ -11,7 +11,7 @@
     "build": "npm run build:types && npm run build:js",
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
-    "start-dev": "cross-env NODE_ENV=development babel-node server --extensions \".ts\" --useLiveData"
+    "start-dev": "cross-env NODE_ENV=development babel-node server --extensions \".tsx,.ts\" --useLiveData --useServerRender"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
